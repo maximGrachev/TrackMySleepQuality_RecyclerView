@@ -116,34 +116,6 @@ class SleepTrackerViewModel(
         _showSnackbarEvent.value = false
     }
 
-    /**
-     * If this is non-null, immediately navigate to [SleepQualityFragment] and call [doneNavigating]
-     */
-    val navigateToSleepQuality: LiveData<SleepNight>
-        get() = _navigateToSleepQuality
-
-    /**
-     * Call this immediately after navigating to [SleepQualityFragment]
-     *
-     * It will clear the navigation request, so if the user rotates their phone it won't navigate
-     * twice.
-     */
-    fun doneNavigating() {
-        _navigateToSleepQuality.value = null
-    }
-
-    private val _navigateToSleepDataQuality = MutableLiveData<Long>()
-    val navigateToSleepDataQuality
-        get() = _navigateToSleepDataQuality
-
-    fun onSleepNightClicked(id: Long) {
-        _navigateToSleepDataQuality.value = id
-    }
-
-    fun onSleepDataQualityNavigated() {
-        _navigateToSleepDataQuality.value = null
-    }
-
     init {
         initializeTonight()
     }
@@ -246,10 +218,39 @@ class SleepTrackerViewModel(
      * At this point, we want to cancel all coroutines;
      * otherwise we end up with processes that have nowhere to return to
      * using memory and resources.
+     *
 
     override fun onCleared() {
         super.onCleared()
         viewModelJob.cancel()
     }
      */
+
+    /**
+     * If this is non-null, immediately navigate to [SleepQualityFragment] and call [doneNavigating]
+     */
+    val navigateToSleepQuality: LiveData<SleepNight>
+        get() = _navigateToSleepQuality
+
+    /**
+     * Call this immediately after navigating to [SleepQualityFragment]
+     *
+     * It will clear the navigation request, so if the user rotates their phone it won't navigate
+     * twice.
+     */
+    fun doneNavigating() {
+        _navigateToSleepQuality.value = null
+    }
+
+    private val _navigateToSleepDetail = MutableLiveData<Long>()
+    val navigateToSleepDetail
+        get() = _navigateToSleepDetail
+
+    fun onSleepNightClicked(id: Long) {
+        _navigateToSleepDetail.value = id
+    }
+
+    fun onSleepDetailNavigated() {
+        _navigateToSleepDetail.value = null
+    }
 }

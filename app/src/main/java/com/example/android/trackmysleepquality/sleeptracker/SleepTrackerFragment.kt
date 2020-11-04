@@ -20,11 +20,14 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.example.android.trackmysleepquality.R
 import com.example.android.trackmysleepquality.database.SleepDatabase
 import com.example.android.trackmysleepquality.database.SleepNight
@@ -62,16 +65,31 @@ class SleepTrackerFragment : Fragment() {
 
         binding.sleepTrackerViewModel = sleepTrackerViewModel
 
-        val adapter = SleepNightAdapter()
-        binding.sleepList.adapter = adapter
+        val manager = GridLayoutManager(activity, 4, GridLayoutManager.VERTICAL, false)
+        binding.sleepList.layoutManager = manager
 
-        sleepTrackerViewModel.nights.observe(viewLifecycleOwner, Observer {
-            it?.let{
-                adapter.submitList(it)
-            }
+        val adapter = SleepNightAdapter(SleepNightListener {
+            nightId ->  sleepTrackerViewModel.onSleepNightClicked(nightId)
         })
 
         binding.lifecycleOwner = this
+
+        binding.sleepList.adapter = adapter
+
+        sleepTrackerViewModel.navigateToSleepDetail.observe(this, Observer { night ->
+            night?.let {
+                this.findNavController().navigate(
+                        SleepTrackerFragmentDirections
+                                .actionSleepTrackerFragmentToSleepDetailFragment(night))
+                sleepTrackerViewModel.onSleepDetailNavigated()
+            }
+        })
+
+        sleepTrackerViewModel.nights.observe(viewLifecycleOwner, Observer {
+            it?.let {
+                adapter.submitList(it)
+            }
+        })
 
         // Add an Observer on the state variable for showing a Snackbar message
         // when the CLEAR button is pressed.
